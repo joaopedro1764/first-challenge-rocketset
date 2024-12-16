@@ -4,8 +4,6 @@ import { ChangeEvent, FormEvent, useState } from "react";
 import { Trash, RadioButton, Check } from "@phosphor-icons/react";
 function App() {
 
-
-
   type TaskProps = {
     name: string,
     isFinish: boolean
@@ -16,14 +14,16 @@ function App() {
   const [tasks, setTasks] = useState<TaskProps[]>([]);
   const haveTasks = tasks.length === 0;
 
+  const countIsFinish = tasks.reduce((count, task) => {
+    return task.isFinish ? count + 1 : count;
+  }, 0);
+
   function handleCreateNewTask(event: FormEvent) {
     event.preventDefault();
-
     const newTask: TaskProps = {
       name: newNameTask,
       isFinish: false
     }
-
     setTasks((prevArray) => [...prevArray, newTask]);
     setNewTask("");
   }
@@ -48,8 +48,6 @@ function App() {
       return task;
     });
     setTasks(updatedTasks);
-
-    console.log(tasks)
   }
 
   return (
@@ -71,9 +69,11 @@ function App() {
           <div className="flex items-center gap-2">
             <span
               className="text-purple text-base">Concluídas</span>
-            <p className="w-4 h-4 rounded-full bg-gray-400 flex items-center justify-center p-3.5 text-sm text-white">
-              0
-            </p>
+            <div className="rounded-full bg-gray-400 flex gap-x-1 items-center justify-center p-1.5 text-sm text-white">
+              <p>{countIsFinish}</p>
+              <p>de</p>
+              <p>{tasks.length}</p>
+            </div>
           </div>
         </div>
         {haveTasks && (
@@ -98,17 +98,13 @@ function App() {
                   key={task.name}
                 >
                   <div className="flex items-center space-x-4">
-                    <label className="flex items-center space-x-2 cursor-pointer">
-                      <input
-                        onChange={() => handleCheckChangeInput(task)}
-                        checked={task.isFinish}
-                        type="checkbox" // Usando checkbox
-                      />
-
-                      {task.isFinish && (
-                        <RadioButton className="text-white w-6 h-6" />
-                      )}
-                    </label>
+                    <button
+                      className={`w-7 h-7 flex justify-center items-center rounded-full text-white ${task.isFinish ? "bg-purple-dark" : "border-2 border-blue"}`}
+                      onClick={() => handleCheckChangeInput(task)}>
+                      {
+                        task.isFinish && <Check />
+                      }
+                    </button>
                   </div>
                   <p className={`text-white ${task.isFinish && "line-through"}`}>{task.name}</p>
                   <button onClick={() => handleDeleteTask(task.name)}>
